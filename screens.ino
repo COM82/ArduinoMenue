@@ -28,6 +28,8 @@ const String PROGMEM subMenue[][3]  = {
   {"initialisiert", "speicher", " "}
 };
 
+
+
 //const String PROGMEM
 const String PROGMEM  test[][4] = {
   {"Das 1", "Dann 2", "oder 3", "doch 4"},
@@ -69,7 +71,6 @@ void screenWert() {
   lcd.setCursor(0, 0);
   lcd.print("Wert");
   lcd.setCursor(0, 1);
-  lcd.print("hier steht der Wert");
+  lcd.print(subMenueWerte[menue0 - 1][submenue - 1]);
 
 }
-
