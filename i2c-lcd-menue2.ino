@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+
 LiquidCrystal_I2C lcd(0x27, 16, 2); // set the LCD address to 0x20 for a 16 chars and 2 line display
 
 
@@ -31,12 +32,28 @@ void buttonSetup() {
 
 //unsigned int anzahlMenue0 = 4;
 #define anzahlMenue0 4
-unsigned int anzahlSubMenue [anzahlMenue0+1] = {0, 3, 3, 2, 1}; //Anzahl der Submenues pro Menue. 0 ist nur ein Platzhalter 
+unsigned int anzahlSubMenue [anzahlMenue0 + 1] = {0, 3, 3, 2, 1}; //Anzahl der Submenues pro Menue. 0 ist nur ein Platzhalter
 unsigned int anzahlPos = 3;
-unsigned int wert [10]={}; //Wert der im Submenue angezeigt wird oder änderbar ist... Anzahl der Spalten ergibt sich aus der Summe der Submenues.
+unsigned int wert [10] = {}; //Wert der im Submenue angezeigt wird oder änderbar ist... Anzahl der Spalten ergibt sich aus der Summe der Submenues.
 unsigned int menue0 = 1;   //Hauptmenü
 unsigned int submenue = 1; //Untermenü
 unsigned int pos = 1;      //aktuelle Positon im Menü. Je nach Wert wird das Menü,Submenü oder der Wert durch die Cursor bearbeitet.
+
+//Ob ein Wert geändert werden darf oder nicht
+//const static unsigned int  subMenueRW [][3]PROGMEM = {
+unsigned int subMenueRW[][3] = {
+  {1, 1, 1},
+  {1, 1, 1},
+  {0, 0, 0},
+  {0, 0, 0}
+};
+
+unsigned int subMenueWerte[4][3] = {
+  {10, 11, 12},
+  {20, 21, 22},
+  {0, 0, 0},
+  {0, 0, 0}
+};
 
 //Funktions-Prototyp damit der compiler die Funktion schon mal kennt. Vor dem Benutzen
 void screen0() ;
@@ -87,7 +104,7 @@ void menues() {
         Serial.println(state);
       */
       //Steuert durch die Ebende 1 Menue0 2 subMenue 3 Werte
-      if (button[x] == hoch) {
+      if (button[x] == runter) {
         pos++;
         if (pos < 1) {
           pos = anzahlPos;
@@ -119,14 +136,12 @@ void menues() {
         }
         screenMenue0();
       }
-      
+
       if (pos == 2) {
         if (button[x] == links) {
           Serial.print("submenue L ");
-
           submenue--;
-          anzahlSubMenue[menue0];
-          if (anzahlSubMenue[menue0] < 1) {
+          if (submenue < 1) {
             submenue = anzahlSubMenue[menue0];
           }
           Serial.println(submenue);
@@ -142,10 +157,24 @@ void menues() {
         }
         screenSubMenue();
       }
-     if (pos == 3) {
-      Serial.println("Wert");
-      screenWert();      
-     }
+      if (pos == 3) {
+          if (button[x] == links) {
+          if (subMenueRW[menue0 - 1][submenue - 1] == 1) {
+            subMenueWerte[menue0 - 1][submenue - 1] --;
+            Serial.print("Wert--");
+            Serial.println(subMenueWerte[menue0 - 1][submenue - 1]);
+          }
+        }
+
+        if (button[x] == rechts) {
+          if (subMenueRW[menue0 - 1][submenue - 1] == 1) {
+            subMenueWerte[menue0 - 1][submenue - 1] ++;
+            Serial.print("Wert++");
+            Serial.println(subMenueWerte[menue0 - 1][submenue - 1]);
+          }
+        }
+        screenWert();
+      }
     }
   }
 }
@@ -235,5 +264,4 @@ int buttonHandler(int number)
       return 0;
   }
 }
-
 
